@@ -15,13 +15,12 @@ public class User {
     private Long id;
 
     @Column(nullable = false)
-    private String username;
-
-    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
     private String password;
+
+    private boolean fromSocial;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

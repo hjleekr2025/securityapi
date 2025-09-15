@@ -25,6 +25,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 @AllArgsConstructor
 @Log4j2
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserController {
 
     private final UserService userService;
@@ -73,7 +74,7 @@ public class UserController {
             UserDTO responseUserDTO = UserDTO.builder()
                     .email(saveUser.getEmail())
                     .id(saveUser.getId())
-                    .username(saveUser.getUsername())
+                    .fromSocial(saveUser.isFromSocial())
                     .build();
 
             return ResponseEntity.ok().body(responseUserDTO);

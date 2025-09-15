@@ -6,6 +6,7 @@ import com.wwpg.securityapi.user.entity.UserRole;
 import com.wwpg.securityapi.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class UserService {
     public User create(UserDTO userDTO) {
         User user = User.builder()
                 .email(userDTO.getEmail())
-                .username(userDTO.getUsername())
+                .fromSocial(false)
                 .password(userDTO.getPassword())
                 .build();
 

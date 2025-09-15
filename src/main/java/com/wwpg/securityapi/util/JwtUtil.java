@@ -25,12 +25,35 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String generateAccessToken(String email) {
+        final long accessTokenValidity = 15 * 60 * 1000L; // 15분
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(email))
+                .claim("role", "USER") // roleSet도 claim에 추가
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidity))
+                .signWith(key)
+                .compact();
+    }
+
     // Refresh Token 생성 ==> Access Token이 만료되었을때 재생성하기 위한 토큰(필요정보최소화)
     public String generateRefreshToken(User user) {
         final long refreshTokenValidity = 7 * 24 * 60 * 60 * 1000L; // 7일
 
         return Jwts.builder()
                 .setSubject(String.valueOf(user.getEmail()))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
+                .signWith(key)
+                .compact();
+    }
+
+    public String generateRefreshToken(String email) {
+        final long refreshTokenValidity = 7 * 24 * 60 * 60 * 1000L; // 7일
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(email))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
                 .signWith(key)
