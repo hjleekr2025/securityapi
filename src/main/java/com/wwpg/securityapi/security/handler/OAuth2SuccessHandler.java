@@ -44,6 +44,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
           , HttpServletResponse response
           , Authentication authentication)
           throws IOException, ServletException {
+    // 이곳으로 오는지 확인
+    System.out.println("==== OAuth2SuccessHandler.onAuthenticationSuccess() ====");
     // 소셜로그인 사용자 확인
     OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
     String email = oAuth2User.getAttribute("email");

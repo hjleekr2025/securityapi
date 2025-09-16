@@ -2,6 +2,8 @@ spring:
   config:
     import:
       - optional:classpath:./secret/oauth2.yml
+      #optional 은 파일이 없으면 무시 하고 넘어 가라는 의미
+      #optinial 설정 안하면 파일이 없으면 springboot 에서 앱 실행이 실패됨
 
   application:
     name: securityapi

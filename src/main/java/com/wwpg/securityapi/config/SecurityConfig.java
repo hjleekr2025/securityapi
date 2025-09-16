@@ -2,6 +2,7 @@ package com.wwpg.securityapi.config;
 
 import com.wwpg.securityapi.security.filter.JwtAuthenticationFilter;
 import com.wwpg.securityapi.security.handler.OAuth2SuccessHandler;
+import com.wwpg.securityapi.security.service.CustomOAuth2UserService;
 import com.wwpg.securityapi.user.repository.UserRepository;
 import com.wwpg.securityapi.util.CookieUtil;
 import com.wwpg.securityapi.util.JwtUtil;
@@ -32,6 +33,7 @@ public class SecurityConfig {
     private final RedisUtil redisUtil;
     private final CookieUtil cookieUtil;
     private final UserRepository userRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -53,6 +55,8 @@ public class SecurityConfig {
                 ;
                 })
                 .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler())
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -87,4 +91,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
