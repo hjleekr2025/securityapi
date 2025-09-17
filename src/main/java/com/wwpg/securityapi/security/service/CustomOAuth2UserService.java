@@ -22,6 +22,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     OAuth2User oAuth2User = super.loadUser(userRequest);
 
     String registrationId = userRequest.getClientRegistration().getRegistrationId();
+    System.out.println("registrationId = " + registrationId);
+    System.out.println("clientName = " + userRequest.getClientRegistration().getClientName());
+    System.out.println("clientId = " + userRequest.getClientRegistration().getClientId());
 
     Map<String, Object> attributes = oAuth2User.getAttributes();
 

@@ -1,6 +1,8 @@
 package com.wwpg.securityapi.config;
 
+import com.wwpg.securityapi.security.component.CustomAuthenticationEntryPoint;
 import com.wwpg.securityapi.security.filter.JwtAuthenticationFilter;
+import com.wwpg.securityapi.security.handler.CustomAccessDeniedHandler;
 import com.wwpg.securityapi.security.handler.OAuth2SuccessHandler;
 import com.wwpg.securityapi.security.service.CustomOAuth2UserService;
 import com.wwpg.securityapi.user.repository.UserRepository;
@@ -34,6 +36,8 @@ public class SecurityConfig {
     private final CookieUtil cookieUtil;
     private final UserRepository userRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -56,8 +60,12 @@ public class SecurityConfig {
                 })
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(oAuth2SuccessHandler())
+                                .userService(customOAuth2UserService))//소셜로그인시 정보전달받고 회원가입정보로 가공
+                        .successHandler(oAuth2SuccessHandler())//소셜로그인성공시 회원가입처리까지
+                )
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)//인증실패시
+                        .accessDeniedHandler(customAccessDeniedHandler)//권한부족시
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
