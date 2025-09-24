@@ -92,12 +92,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     cookieUtil.createCookie(response, "refreshToken", refreshToken, 7 * 24 * 60 * 60);
 
     String script = "<script>" +
-            "window.opener.postMessage({ accessToken: '" + accessToken + "' }, 'http://localhost:5173');" +
+            "window.opener.postMessage({ accessToken: '" + accessToken +
+            "', user: {email: '" + email + "', role: '" + "USER" + "' }}, 'http://localhost:5173');" +
             "window.close();" +
             "</script>";
 
     response.setContentType("text/html;charset=UTF-8");
 
+    System.out.println(script);
     System.out.println(accessToken);
     System.out.println("소셜로그인 성공");
 

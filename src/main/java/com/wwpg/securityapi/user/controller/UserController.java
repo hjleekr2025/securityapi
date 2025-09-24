@@ -62,7 +62,7 @@ public class UserController {
 
         // Access Token만 응답으로 보내기 => React에서는 LocalStorage에 저장하여
         // API호출시 헤더에 "Bearer "+token을 넣어 사용한다.
-        return ResponseEntity.ok(Map.of("accessToken", accessToken));
+        return ResponseEntity.ok(Map.of("accessToken", accessToken, "user", Map.of("email", user.getEmail(), "role", user.getRole())));
     }
 
     @PostMapping("/signup")
@@ -94,7 +94,7 @@ public class UserController {
     // 유효한 토큰이면 access토큰을 다시 만들어서 react로 보내고
     // 유효하지 않은 refresh토큰이면 401에러를 보내서 로그인 페이지가 나오도록 구현한다.
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request) {
+    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = cookieUtil.getCookie(request, "refreshToken");
 
         if (refreshToken == null || refreshToken.isBlank()) {
@@ -117,11 +117,23 @@ public class UserController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             String newAccessToken = jwtUtil.generateAccessToken(user);
-            //return ResponseEntity.ok().body(Map.of("accessToken", newAccessToken));
+            System.out.println("New AccessToken 발급");
+
+            // === 추가: Refresh Token Sliding 갱신 ===
+            // refresh 토큰 유효기간이 2일 이내 일 때 refresh토큰 재발급하고 redis에 저장
+            long remaining = jwtUtil.getExpiration(refreshToken).getTime() - System.currentTimeMillis();
+            long twoDays = 2 * 24 * 60 * 60 * 1000L;
+
+            if (remaining < twoDays) {
+                String newRefreshToken = jwtUtil.generateRefreshToken(user);
+                redisUtil.saveRefreshToken(userEmail, newRefreshToken, 7 * 24 * 60 * 60);
+                cookieUtil.createCookie(response, "refreshToken", refreshToken, 7 * 24 * 60 * 60);
+            }
+
             return ResponseEntity.ok(Map.of(
                     "accessToken", newAccessToken,
                     "expiresAt", jwtUtil.getExpiration(newAccessToken),
-                    "role", user.getRole()
+                    "user", Map.of("email", userEmail, "role", user.getRole())
             ));
         }
 
